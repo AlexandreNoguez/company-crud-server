@@ -21,8 +21,6 @@ import { EmailService } from './shared/email/email.service';
       autoLoadEntities: true,
       synchronize: true, // use false in production, should be used only in development
       logging: process.env.DB_LOGGING === 'true',
-      entities: ['dist/**/*.entity{.ts,.js}'],
-      migrations: ['dist/migrations/*{.ts,.js}'],
     }),
     CompanyModule,
   ],
