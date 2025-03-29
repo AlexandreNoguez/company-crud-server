@@ -12,7 +12,7 @@ async function bootstrap() {
 
   if (isDev) {
     const config = new DocumentBuilder()
-      .setTitle('KPMG API')
+      .setTitle('KPMG-fullstack-test API')
       .setDescription('API for managing companies')
       .setVersion('1.0')
       .build();
