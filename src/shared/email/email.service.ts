@@ -3,13 +3,16 @@ import * as nodemailer from 'nodemailer';
 import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Company } from 'src/@types/company';
+import { Company } from '../../@types/company';
+import { EmailTemplatesNames } from '../../enums/email-templates.enum';
 @Injectable()
 export class EmailService {
   private readonly transporter: nodemailer.Transporter;
 
   constructor() {
     this.transporter = nodemailer.createTransport({
+      logger: false, // change to true if you want to see the logs
+      debug: false, // change to true if you want to see the logs
       host: process.env.MAIL_HOST,
       port: Number(process.env.MAIL_PORT),
       secure: process.env.MAILER_SECURE === 'true',
@@ -37,7 +40,7 @@ export class EmailService {
 
   async sendCompanyNotification(
     company: Company,
-    templateName: 'company-created.hbs' | 'company-updated.hbs',
+    templateName: EmailTemplatesNames,
     subject: string,
   ): Promise<void> {
     const template = this.loadTemplate(templateName);
@@ -50,9 +53,14 @@ export class EmailService {
     });
 
     await this.transporter.sendMail({
+      from: process.env.MAIL_FROM,
       to: company.destinatario,
       subject,
+      text: `Nova empresa cadastrada: ${company.nome} - ${company.cnpj}`,
       html,
+      headers: {
+        'List-Unsubscribe': '<mailto:suporte@alexandrenoguez.dev.br>',
+      },
     });
   }
 }
