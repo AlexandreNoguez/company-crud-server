@@ -2,6 +2,10 @@ import { EmailService } from './email.service';
 import * as nodemailer from 'nodemailer';
 import * as fs from 'fs';
 import * as handlebars from 'handlebars';
+import {
+  COMPANY_CREATED_TEMPLATE,
+  NEW_COMPANY_CREATED_TITLE,
+} from '../../constants/email-templates';
 
 jest.mock('nodemailer');
 jest.mock('fs');
@@ -42,8 +46,8 @@ describe('EmailService', () => {
 
     await emailService.sendCompanyNotification(
       company,
-      'company-created.hbs',
-      'Nova empresa cadastrada!',
+      COMPANY_CREATED_TEMPLATE,
+      NEW_COMPANY_CREATED_TITLE,
     );
 
     expect(fs.readFileSync).toHaveBeenCalledWith(
@@ -54,8 +58,12 @@ describe('EmailService', () => {
     expect(handlebars.compile).toHaveBeenCalledWith('template-source');
     expect(mockSendMail).toHaveBeenCalledWith({
       to: company.destinatario,
-      subject: 'Nova empresa cadastrada!',
+      subject: NEW_COMPANY_CREATED_TITLE,
       html: '<html>Email content</html>',
+      headers: {
+        'List-Unsubscribe': '<mailto:suporte@alexandrenoguez.dev.br>',
+      },
+      text: `Nova empresa cadastrada: ${company.nome} - ${company.cnpj}`,
     });
   });
 
@@ -75,7 +83,7 @@ describe('EmailService', () => {
     await expect(
       emailService.sendCompanyNotification(
         company,
-        'company-created.hbs',
+        COMPANY_CREATED_TEMPLATE,
         'Erro de template',
       ),
     ).rejects.toThrow(
