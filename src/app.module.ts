@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompanyModule } from './modules/company/company.module';
 import { ConfigModule } from '@nestjs/config';
 import { EmailService } from './shared/email/email.service';
+import { EmailModule } from './shared/email/email.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { EmailService } from './shared/email/email.service';
       logging: process.env.DB_LOGGING === 'true',
     }),
     CompanyModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],

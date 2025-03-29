@@ -1,0 +1,61 @@
+<html lang='pt-BR'>
+  <head>
+    <meta charset='UTF-8' />
+    <title>Empresa Atualizada</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f7fafc;
+        padding: 20px;
+        color: #444;
+      }
+
+      .box {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 600px;
+        margin: auto;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        color: #2e7d32;
+        margin-bottom: 20px;
+      }
+
+      .details {
+        background-color: #e8f5e9;
+        padding: 15px;
+        border-radius: 6px;
+      }
+
+      p {
+        margin: 6px 0;
+      }
+
+      .footer {
+        margin-top: 20px;
+        font-size: 12px;
+        color: #888;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='box'>
+      <h2>✅ Dados da empresa foram atualizados</h2>
+
+      <div class='details'>
+        <p><strong>Nome:</strong> {{nome}}</p>
+        <p><strong>Nome Fantasia:</strong> {{nomeFantasia}}</p>
+        <p><strong>CNPJ:</strong> {{cnpj}}</p>
+        <p><strong>Endereço:</strong> {{endereco}}</p>
+      </div>
+
+      <div class='footer'>
+        Atualização realizada via sistema KPMG.
+      </div>
+    </div>
+  </body>
+</html>

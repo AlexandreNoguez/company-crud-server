@@ -1,0 +1,61 @@
+<html lang='pt-BR'>
+  <head>
+    <meta charset='UTF-8' />
+    <title>Nova Empresa Cadastrada</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        max-width: 600px;
+        margin: auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      h2 {
+        color: #1976d2;
+        margin-bottom: 24px;
+      }
+
+      p {
+        margin: 6px 0;
+      }
+
+      .info {
+        background-color: #f0f4ff;
+        padding: 15px;
+        border-radius: 6px;
+      }
+
+      .footer {
+        margin-top: 24px;
+        font-size: 12px;
+        color: #999;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <h2>🎉 Nova empresa cadastrada com sucesso!</h2>
+
+      <div class='info'>
+        <p><strong>Nome:</strong> {{nome}}</p>
+        <p><strong>Nome Fantasia:</strong> {{nomeFantasia}}</p>
+        <p><strong>CNPJ:</strong> {{cnpj}}</p>
+        <p><strong>Endereço:</strong> {{endereco}}</p>
+      </div>
+
+      <div class='footer'>
+        Esta é uma notificação automática do sistema KPMG.
+      </div>
+    </div>
+  </body>
+</html>
