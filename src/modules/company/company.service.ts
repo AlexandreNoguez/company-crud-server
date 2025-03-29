@@ -1,10 +1,12 @@
+import { Repository } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { EmailService } from '../../shared/email/email.service';
-import { Repository } from 'typeorm';
 import { Company } from './entities/company.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { handleDatabaseError } from '../../shared/helpers/handle-database-error';
 import {
   COMPANY_CREATED_TEMPLATE,
   COMPANY_UPDATED_TEMPLATE,
@@ -25,23 +27,28 @@ export class CompanyService {
    * @param createCompanyDto - Dados para criação da empresa
    * @returns Empresa criada
    */
-  async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
-    const company = this.companyRepository.create(createCompanyDto);
-    const saved = await this.companyRepository.save(company);
+  async create(createCompanyDto: CreateCompanyDto): Promise<Company | null> {
+    try {
+      const company = this.companyRepository.create(createCompanyDto);
+      const saved = await this.companyRepository.save(company);
 
-    await this.emailService.sendCompanyNotification(
-      {
-        nome: saved.name,
-        nomeFantasia: saved.tradeName,
-        cnpj: saved.cnpj,
-        endereco: saved.address,
-        destinatario: process.env.NOTIFY_EMAILS!,
-      },
-      COMPANY_CREATED_TEMPLATE,
-      NEW_COMPANY_CREATED_TITLE,
-    );
+      await this.emailService.sendCompanyNotification(
+        {
+          nome: saved.name,
+          nomeFantasia: saved.tradeName,
+          cnpj: saved.cnpj,
+          endereco: saved.address,
+          destinatario: process.env.NOTIFY_EMAILS!,
+        },
+        COMPANY_CREATED_TEMPLATE,
+        NEW_COMPANY_CREATED_TITLE,
+      );
 
-    return saved;
+      return saved;
+    } catch (error) {
+      handleDatabaseError(error, 'Erro ao criar a empresa.');
+      return null;
+    }
   }
 
   /**
@@ -72,31 +79,40 @@ export class CompanyService {
   async update(
     id: number,
     updateCompanyDto: UpdateCompanyDto,
-  ): Promise<Company> {
-    const company = await this.companyRepository.preload({
-      id,
-      ...updateCompanyDto,
-    });
+  ): Promise<Company | null> {
+    try {
+      const company = await this.companyRepository.preload({
+        id,
+        ...updateCompanyDto,
+      });
 
-    if (!company) {
-      throw new NotFoundException(`Empresa com ID ${id} não encontrada`);
+      if (!company) {
+        throw new NotFoundException(`Empresa com ID ${id} não encontrada`);
+      }
+
+      const updated = await this.companyRepository.save(company);
+
+      await this.emailService.sendCompanyNotification(
+        {
+          nome: updated.name,
+          nomeFantasia: updated.tradeName,
+          cnpj: updated.cnpj,
+          endereco: updated.address,
+          destinatario: process.env.NOTIFY_EMAILS!,
+        },
+        COMPANY_UPDATED_TEMPLATE,
+        COMPANY_UPDATED_TITLE,
+      );
+
+      return updated;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      handleDatabaseError(error, 'Erro ao atualizar a empresa.');
+      return null; // Retorna null em caso de erro
     }
-
-    const updated = await this.companyRepository.save(company);
-
-    await this.emailService.sendCompanyNotification(
-      {
-        nome: updated.name,
-        nomeFantasia: updated.tradeName,
-        cnpj: updated.cnpj,
-        endereco: updated.address,
-        destinatario: process.env.NOTIFY_EMAILS!,
-      },
-      COMPANY_UPDATED_TEMPLATE,
-      COMPANY_UPDATED_TITLE,
-    );
-
-    return updated;
   }
 
   /**
