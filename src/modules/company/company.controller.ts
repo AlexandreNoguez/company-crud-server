@@ -6,10 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ConflictException,
-  HttpException,
-  HttpStatus,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -23,7 +19,6 @@ import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company } from './entities/company.entity';
-import { formatError } from 'src/shared/helpers/error.helper';
 
 @ApiTags('Empresas')
 @Controller('companies')
@@ -39,13 +34,7 @@ export class CompanyController {
   })
   @ApiBody({ type: CreateCompanyDto })
   async create(@Body() createCompanyDto: CreateCompanyDto) {
-    try {
-      return await this.companyService.create(createCompanyDto);
-    } catch (error) {
-      console.log(error);
-
-      throw formatError('Erro interno', error);
-    }
+    return await this.companyService.create(createCompanyDto);
   }
 
   @Get()
@@ -85,22 +74,7 @@ export class CompanyController {
     @Param('id') id: string,
     @Body() updateCompanyDto: UpdateCompanyDto,
   ) {
-    try {
-      return await this.companyService.update(+id, updateCompanyDto);
-    } catch (error: unknown) {
-      if (isDatabaseError(error) && error.code === '23505') {
-        throw new HttpException(
-          {
-            status: HttpStatus.CONFLICT,
-            error: 'CNPJ já cadastrado',
-          },
-          HttpStatus.CONFLICT,
-          { cause: error },
-        );
-      }
-
-      throw error;
-    }
+    return await this.companyService.update(+id, updateCompanyDto);
   }
 
   @Delete(':id')
@@ -111,13 +85,4 @@ export class CompanyController {
   async remove(@Param('id') id: string) {
     return await this.companyService.remove(+id);
   }
-}
-
-function isDatabaseError(error: unknown): error is { code: string } {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    typeof (error as { code: string }).code === 'string'
-  );
 }
