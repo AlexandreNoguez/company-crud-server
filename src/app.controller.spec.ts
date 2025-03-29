@@ -22,9 +22,7 @@ describe('AppController', () => {
         description: 'This is a simple health check response',
       };
 
-      expect(appController.getHealthCheck()).toEqual(
-        JSON.stringify(healthCheck),
-      );
+      expect(appController.getHealthCheck()).toEqual(healthCheck);
     });
   });
 });
