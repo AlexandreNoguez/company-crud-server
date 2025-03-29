@@ -20,6 +20,11 @@ export class CompanyService {
     private readonly companyRepository: Repository<Company>,
   ) {}
 
+  /**
+   * Cria uma nova empresa e envia uma notificação por e-mail.
+   * @param createCompanyDto - Dados para criação da empresa
+   * @returns Empresa criada
+   */
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
     const company = this.companyRepository.create(createCompanyDto);
     const saved = await this.companyRepository.save(company);
@@ -39,16 +44,31 @@ export class CompanyService {
     return saved;
   }
 
+  /**
+   * Lista todas as empresas cadastradas.
+   * @returns Lista de empresas
+   */
   findAll() {
     return this.companyRepository.find();
   }
 
+  /**
+   * Retorna os dados de uma empresa específica.
+   * @param id - ID da empresa
+   * @returns Empresa encontrada ou null
+   */
   findOne(id: number) {
     return this.companyRepository.findOne({
       where: { id },
     });
   }
 
+  /**
+   * Atualiza os dados de uma empresa existente e envia uma notificação.
+   * @param id - ID da empresa
+   * @param updateCompanyDto - Novos dados da empresa
+   * @returns Empresa atualizada
+   */
   async update(
     id: number,
     updateCompanyDto: UpdateCompanyDto,
@@ -79,6 +99,11 @@ export class CompanyService {
     return updated;
   }
 
+  /**
+   * Remove uma empresa pelo ID.
+   * @param id - ID da empresa
+   * @returns Resultado da operação de remoção
+   */
   async remove(id: number) {
     const result = await this.companyRepository.delete(id);
     if (result.affected === 0) {
