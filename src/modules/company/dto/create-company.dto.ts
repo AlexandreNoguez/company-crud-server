@@ -18,7 +18,10 @@ export class CreateCompanyDto {
   @IsString()
   tradeName: string;
 
-  @ApiProperty({ example: 'Rua X, 123 - Bairro Y, SP' })
+  @ApiProperty({
+    example:
+      'Minha rua, 280 - Com complemento, Meu bairro, minha cidade - RS, CEP: 99999-999',
+  })
   @IsNotEmpty()
   @IsString()
   address: string;
