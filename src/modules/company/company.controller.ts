@@ -77,6 +77,15 @@ export class CompanyController {
     return await this.companyService.update(+id, updateCompanyDto);
   }
 
+  @Delete('soft/:id')
+  @ApiOperation({ summary: 'Remove uma empresa' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Empresa removida com sucesso' })
+  @ApiResponse({ status: 404, description: 'Empresa não encontrada' })
+  async softRemove(@Param('id') id: number) {
+    return this.companyService.softRemove(id);
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Remove uma empresa' })
   @ApiParam({ name: 'id', type: Number })

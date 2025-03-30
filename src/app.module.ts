@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompanyModule } from './modules/company/company.module';
-import { ConfigModule } from '@nestjs/config';
 import { EmailService } from './shared/email/email.service';
 import { EmailModule } from './shared/email/email.module';
 

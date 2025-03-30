@@ -60,14 +60,22 @@ export class CompanyService {
   }
 
   /**
-   * Retorna os dados de uma empresa específica.
-   * @param id - ID da empresa
-   * @returns Empresa encontrada ou null
+   * Retrieves a company by its unique identifier.
+   *
+   * @param id - The unique identifier of the company to retrieve.
+   * @returns The company entity if found.
+   * @throws NotFoundException - If no company is found with the given identifier.
    */
-  findOne(id: number) {
-    return this.companyRepository.findOne({
+  async findOne(id: number) {
+    const company = await this.companyRepository.findOne({
       where: { id },
     });
+
+    if (!company) {
+      throw new NotFoundException('Empresa não encontrada');
+    }
+
+    return company;
   }
 
   /**
@@ -113,6 +121,26 @@ export class CompanyService {
       handleDatabaseError(error, 'Erro ao atualizar a empresa.');
       return null; // Retorna null em caso de erro
     }
+  }
+
+  /**
+   * Soft deletes a company by its ID.
+   *
+   * This method retrieves a company entity by its ID and performs a soft delete operation,
+   * which marks the entity as deleted without permanently removing it from the database.
+   *
+   * @param id - The unique identifier of the company to be soft deleted.
+   * @throws NotFoundException - If no company is found with the provided ID.
+   * @returns A promise that resolves when the soft delete operation is complete.
+   */
+  async softRemove(id: number): Promise<void> {
+    const company = await this.companyRepository.findOne({ where: { id } });
+
+    if (!company) {
+      throw new NotFoundException('Empresa não encontrada');
+    }
+
+    await this.companyRepository.softRemove(company);
   }
 
   /**
