@@ -19,6 +19,7 @@ const mockCompanyRepository = {
   find: jest.fn(),
   findOne: jest.fn(),
   delete: jest.fn(),
+  findAndCount: jest.fn(),
 };
 
 const mockEmailService = {
@@ -121,12 +122,24 @@ describe('CompanyService', () => {
 
   it('should return all companies', async () => {
     const companies = [{ id: 1 }, { id: 2 }];
-    mockCompanyRepository.find.mockResolvedValue(companies);
+    const total = 2;
 
-    const result = await service.findAll();
+    mockCompanyRepository.findAndCount.mockResolvedValue([companies, total]);
 
-    expect(mockCompanyRepository.find).toHaveBeenCalled();
-    expect(result).toEqual(companies);
+    const result = await service.findAll(1, 10);
+
+    expect(mockCompanyRepository.findAndCount).toHaveBeenCalledWith({
+      skip: 0,
+      take: 10,
+      order: { id: 'ASC' },
+    });
+
+    expect(result).toEqual({
+      data: companies,
+      total,
+      page: 1,
+      lastPage: 1,
+    });
   });
 
   it('should return one company by id', async () => {
