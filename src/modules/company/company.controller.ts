@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -38,16 +40,29 @@ export class CompanyController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Lista todas as empresas' })
+  @ApiOperation({ summary: 'Lista todas as empresas paginadas' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({
     status: 200,
-    description: 'Lista de empresas',
-    type: [Company],
+    description: 'Empresas com paginação',
+    schema: {
+      example: {
+        data: [{ id: 1, name: 'Empresa 1' }],
+        total: 13,
+        page: 1,
+        lastPage: 2,
+      },
+    },
   })
-  async findAll() {
-    return await this.companyService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.companyService.findAll(Number(page), Number(limit));
   }
 
+  @Get(':id')
   @ApiOperation({ summary: 'Consulta uma empresa por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({
@@ -56,7 +71,6 @@ export class CompanyController {
     type: Company,
   })
   @ApiResponse({ status: 404, description: 'Empresa não encontrada' })
-  @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.companyService.findOne(+id);
   }

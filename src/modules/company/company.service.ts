@@ -55,8 +55,19 @@ export class CompanyService {
    * Lista todas as empresas cadastradas.
    * @returns Lista de empresas
    */
-  findAll() {
-    return this.companyRepository.find();
+  async findAll(page = 1, limit = 10) {
+    const [data, total] = await this.companyRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { id: 'ASC' },
+    });
+
+    return {
+      data,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
   }
 
   /**
