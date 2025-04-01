@@ -20,6 +20,7 @@ const mockCompanyRepository = {
   findOne: jest.fn(),
   delete: jest.fn(),
   findAndCount: jest.fn(),
+  softRemove: jest.fn(),
 };
 
 const mockEmailService = {
@@ -167,5 +168,56 @@ describe('CompanyService', () => {
     mockCompanyRepository.delete.mockResolvedValue({ affected: 0 });
 
     await expect(service.remove(1)).rejects.toThrow(NotFoundException);
+  });
+
+  it('should throw error when creating a company fails', async () => {
+    const dto = {
+      name: 'Empresa Y',
+      tradeName: 'Y LTDA',
+      cnpj: '11111111111111',
+      address: 'Rua Y',
+    };
+
+    mockCompanyRepository.create.mockReturnValue(dto);
+    mockCompanyRepository.save.mockRejectedValue(new Error('DB error'));
+
+    await expect(service.create(dto)).rejects.toThrow(
+      'Erro ao criar a empresa.',
+    );
+  });
+
+  it('should throw error when update throws non-NotFound error', async () => {
+    const dto = {
+      name: 'Empresa Z',
+      tradeName: 'Z LTDA',
+      cnpj: '22222222222222',
+      address: 'Rua Z',
+    };
+
+    mockCompanyRepository.preload.mockResolvedValue({ id: 1, ...dto });
+    mockCompanyRepository.save.mockRejectedValue(new Error('Generic error'));
+
+    await expect(service.update(1, dto)).rejects.toThrow(
+      'Erro ao atualizar a empresa.',
+    );
+  });
+
+  it('should soft remove a company', async () => {
+    const company = { id: 1 };
+    mockCompanyRepository.findOne.mockResolvedValue(company);
+    mockCompanyRepository.softRemove = jest.fn().mockResolvedValue(undefined);
+
+    await service.softRemove(1);
+
+    expect(mockCompanyRepository.findOne).toHaveBeenCalledWith({
+      where: { id: 1 },
+    });
+    expect(mockCompanyRepository.softRemove).toHaveBeenCalledWith(company);
+  });
+
+  it('should throw if company not found on softRemove', async () => {
+    mockCompanyRepository.findOne.mockResolvedValue(null);
+
+    await expect(service.softRemove(1)).rejects.toThrow(NotFoundException);
   });
 });
