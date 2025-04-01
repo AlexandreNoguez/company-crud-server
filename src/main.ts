@@ -1,14 +1,16 @@
+import './instrument';
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { GlobalHttpExceptionFilter } from './shared/filters/http-exception.filter';
+import { GlobalHttpExceptionFilter } from './shared/filters/http-exception/global-http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new GlobalHttpExceptionFilter());
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
 

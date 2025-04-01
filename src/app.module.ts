@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -9,8 +10,10 @@ import { CompanyModule } from './modules/company/company.module';
 import { EmailService } from './shared/email/email.service';
 import { EmailModule } from './shared/email/email.module';
 
+import { SeedModule } from './modules/seed/seed.module';
 @Module({
   imports: [
+    SentryModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -27,8 +30,16 @@ import { EmailModule } from './shared/email/email.module';
     }),
     CompanyModule,
     EmailModule,
+    SeedModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService],
+  providers: [
+    AppService,
+    EmailService,
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
+  ],
 })
 export class AppModule {}
