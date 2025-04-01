@@ -17,11 +17,9 @@ export class SeedController {
         'Rua Reverendo Olavo Nunes, 280 - BL5 APTO 501, Parque Santa Fé, Porto Alegre - RS, CEP: 91180-370',
     }));
 
-    // const results = [];
 
     for (const empresa of empresas) {
       await this.companyService.create(empresa);
-      // results.push(created);
     }
 
     return { message: 'Seed criada com sucesso!' };

@@ -18,15 +18,12 @@ describe('EmailService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Mock do transportador do nodemailer
     (nodemailer.createTransport as jest.Mock).mockReturnValue({
       sendMail: mockSendMail,
     });
 
-    // Mock do fs
     (fs.readFileSync as jest.Mock).mockReturnValue('template-source');
 
-    // Mock do handlebars
     const compiledTemplate = jest
       .fn()
       .mockReturnValue('<html>Email content</html>');

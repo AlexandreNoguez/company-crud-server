@@ -5,6 +5,5 @@ import { CompanyModule } from '../company/company.module';
 @Module({
   imports: [CompanyModule],
   controllers: [SeedController],
-  // providers: [SeedService],
 })
 export class SeedModule {}

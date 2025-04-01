@@ -130,7 +130,7 @@ export class CompanyService {
       }
 
       handleDatabaseError(error, 'Erro ao atualizar a empresa.');
-      return null; // Retorna null em caso de erro
+      return null;
     }
   }
 

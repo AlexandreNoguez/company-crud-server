@@ -88,7 +88,7 @@ describe('GlobalHttpExceptionFilter', () => {
       path: '/test',
       method: 'GET',
       timestamp: expect.any(String),
-      details: expect.any(String), // Stack trace exists
+      details: expect.any(String),
     });
   });
 
