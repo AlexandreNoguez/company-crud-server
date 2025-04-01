@@ -8,12 +8,12 @@ export class CreateCompanyDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: 'NoguezCorp' })
+  @ApiProperty({ example: '98.722.004/0001-04' })
   @IsNotEmpty()
   @IsString()
   cnpj: string;
 
-  @ApiProperty({ example: 'NoguezCorp' })
+  @ApiProperty({ example: 'NoguezFantasy' })
   @IsNotEmpty()
   @IsString()
   tradeName: string;
