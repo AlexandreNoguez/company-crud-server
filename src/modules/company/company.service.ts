@@ -6,7 +6,7 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { EmailService } from '../../shared/email/email.service';
 import { Company } from './entities/company.entity';
-import { handleDatabaseError } from '../../shared/helpers/handle-database-error';
+import { handleDatabaseError } from '../../shared/helpers/handle-database-error/handle-database-error';
 import {
   COMPANY_CREATED_TEMPLATE,
   COMPANY_UPDATED_TEMPLATE,
