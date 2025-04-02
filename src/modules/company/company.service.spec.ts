@@ -12,23 +12,31 @@ import {
   NEW_COMPANY_CREATED_TITLE,
 } from '../../constants/email-templates';
 
-const mockCompanyRepository = {
-  create: jest.fn(),
-  save: jest.fn(),
-  preload: jest.fn(),
-  find: jest.fn(),
-  findOne: jest.fn(),
-  delete: jest.fn(),
-  findAndCount: jest.fn(),
-  softRemove: jest.fn(),
-};
-
-const mockEmailService = {
-  sendCompanyNotification: jest.fn(),
-};
-
 describe('CompanyService', () => {
   let service: CompanyService;
+
+  const mockCompanyRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+    preload: jest.fn(),
+    find: jest.fn(),
+    findOne: jest.fn(),
+    delete: jest.fn(),
+    softRemove: jest.fn(),
+    createQueryBuilder: jest.fn(() => mockQueryBuilder),
+  };
+
+  const mockEmailService = {
+    sendCompanyNotification: jest.fn(),
+  };
+
+  const mockQueryBuilder = {
+    where: jest.fn().mockReturnThis(),
+    orWhere: jest.fn().mockReturnThis(),
+    skip: jest.fn().mockReturnThis(),
+    take: jest.fn().mockReturnThis(),
+    getManyAndCount: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -54,9 +62,9 @@ describe('CompanyService', () => {
 
   it('should create a company and send email', async () => {
     const dto = {
-      name: 'Empresa X',
-      tradeName: 'XPTO',
-      cnpj: '123456789',
+      name: 'Empresa 1',
+      tradeName: 'Fantasia',
+      taxId: '123456789',
       address: 'Rua A',
     };
 
@@ -71,10 +79,10 @@ describe('CompanyService', () => {
     expect(mockCompanyRepository.save).toHaveBeenCalledWith(dto);
     expect(mockEmailService.sendCompanyNotification).toHaveBeenCalledWith(
       expect.objectContaining({
-        nome: dto.name,
-        cnpj: dto.cnpj,
-        nomeFantasia: dto.tradeName,
-        endereco: dto.address,
+        name: dto.name,
+        taxId: dto.taxId,
+        tradeName: dto.tradeName,
+        address: dto.address,
       }),
       COMPANY_CREATED_TEMPLATE,
       NEW_COMPANY_CREATED_TITLE,
@@ -86,7 +94,7 @@ describe('CompanyService', () => {
     const dto = {
       name: 'Empresa Atualizada',
       tradeName: 'Atual LTDA',
-      cnpj: '987654321',
+      taxId: '987654321',
       address: 'Rua B',
     };
 
@@ -104,10 +112,10 @@ describe('CompanyService', () => {
     expect(mockCompanyRepository.save).toHaveBeenCalledWith(updatedCompany);
     expect(mockEmailService.sendCompanyNotification).toHaveBeenCalledWith(
       expect.objectContaining({
-        nome: dto.name,
-        cnpj: dto.cnpj,
-        nomeFantasia: dto.tradeName,
-        endereco: dto.address,
+        name: dto.name,
+        taxId: dto.taxId,
+        tradeName: dto.tradeName,
+        address: dto.address,
       }),
       COMPANY_UPDATED_TEMPLATE,
       COMPANY_UPDATED_TITLE,
@@ -121,20 +129,26 @@ describe('CompanyService', () => {
     await expect(service.update(1, {})).rejects.toThrow(NotFoundException);
   });
 
-  it('should return all companies', async () => {
-    const companies = [{ id: 1 }, { id: 2 }];
-    const total = 2;
+  it('should return paginated companies with searchTerm', async () => {
+    const companies = [{ id: 1, name: 'Empresa A' }];
+    const total = 1;
+    mockQueryBuilder.getManyAndCount.mockResolvedValue([companies, total]);
 
-    mockCompanyRepository.findAndCount.mockResolvedValue([companies, total]);
+    const result = await service.findAll(1, 10, 'A');
 
-    const result = await service.findAll(1, 10);
-
-    expect(mockCompanyRepository.findAndCount).toHaveBeenCalledWith({
-      skip: 0,
-      take: 10,
-      order: { id: 'ASC' },
-    });
-
+    expect(mockCompanyRepository.createQueryBuilder).toHaveBeenCalledWith(
+      'company',
+    );
+    expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+      'LOWER(company.name) LIKE LOWER(:searchTerm)',
+      { searchTerm: '%a%' },
+    );
+    expect(mockQueryBuilder.orWhere).toHaveBeenCalledWith(
+      'LOWER(company.tradeName) LIKE LOWER(:searchTerm)',
+      { searchTerm: '%a%' },
+    );
+    expect(mockQueryBuilder.skip).toHaveBeenCalledWith(0);
+    expect(mockQueryBuilder.take).toHaveBeenCalledWith(10);
     expect(result).toEqual({
       data: companies,
       total,
@@ -174,7 +188,7 @@ describe('CompanyService', () => {
     const dto = {
       name: 'Empresa Y',
       tradeName: 'Y LTDA',
-      cnpj: '11111111111111',
+      taxId: '11111111111111',
       address: 'Rua Y',
     };
 
@@ -190,7 +204,7 @@ describe('CompanyService', () => {
     const dto = {
       name: 'Empresa Z',
       tradeName: 'Z LTDA',
-      cnpj: '22222222222222',
+      taxId: '22222222222222',
       address: 'Rua Z',
     };
 
