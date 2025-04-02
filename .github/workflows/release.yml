@@ -1,0 +1,78 @@
+name: Release and Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+
+      - name: Get current version
+        id: version
+        run: |
+          VERSION=$(cat version.txt | tr -d '\n')
+          echo "current_version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Increment version
+        id: increment
+        run: |
+          NEW_VERSION=$(node .github/scripts/increment-version.js ${{ steps.version.outputs.current_version }} patch)
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit version bump
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions Bot"
+          git add version.txt
+          git commit -m "Bump version to v${{ steps.increment.outputs.new_version }}"
+          git push origin HEAD
+
+      - name: Create Git tag
+        run: git tag -a v${{ steps.increment.outputs.new_version }} -m "Release version v${{ steps.increment.outputs.new_version }}"
+
+      - name: Push Git tag
+        run: git push origin v${{ steps.increment.outputs.new_version }}
+
+    outputs:
+      new_version: ${{ steps.increment.outputs.new_version }}
+
+  deploy:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/workspace/company-crud-server
+            git pull origin main
+            npm install
+            npm run build
+            pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
