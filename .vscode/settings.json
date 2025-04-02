@@ -5,5 +5,12 @@
   },
   "eslint.useFlatConfig": true,
   "eslint.validate": ["typescript"],
-  "prettier.enableDebugLogs": false
+  "prettier.enableDebugLogs": false,
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#a51c3c",
+    "titleBar.activeBackground": "#a51c3c",
+    "titleBar.activeForeground": "#FBFCFE",
+    "symbolIcon.": "#000",
+    "icon.foreground": "#FFF" // Cor dos ícones da barra lateral
+  }
 }
