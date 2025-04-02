@@ -5,16 +5,17 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { NotFoundException } from '@nestjs/common';
 
-const mockCompanyService = {
-  create: jest.fn(),
-  findAll: jest.fn(),
-  findOne: jest.fn(),
-  update: jest.fn(),
-  remove: jest.fn(),
-};
-
 describe('CompanyController', () => {
   let controller: CompanyController;
+
+  const mockCompanyService = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
+    softRemove: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -42,7 +43,7 @@ describe('CompanyController', () => {
     const dto: CreateCompanyDto = {
       name: 'Empresa Nova',
       tradeName: 'Nome Fantasia',
-      cnpj: '12345678000199',
+      taxId: '12345678000199',
       address: 'Rua X',
     };
 
@@ -56,14 +57,26 @@ describe('CompanyController', () => {
     expect(result).toEqual(savedCompany);
   });
 
-  it('should return all companies', async () => {
-    const companies = [{ id: 1 }, { id: 2 }];
-    mockCompanyService.findAll.mockResolvedValue(companies);
+  it('should return a paginated list of companies when findAll is called', async () => {
+    const page = 1;
+    const limit = 10;
+    const searchTerm = '';
+    const mockCompaniesResponse = {
+      data: [{ id: 1 }, { id: 2 }],
+      total: 2,
+      page: 1,
+      lastPage: 1,
+    };
+    mockCompanyService.findAll.mockResolvedValue(mockCompaniesResponse);
 
-    const result = await controller.findAll();
+    const result = await controller.findAll(page, limit, searchTerm);
 
-    expect(mockCompanyService.findAll).toHaveBeenCalled();
-    expect(result).toEqual(companies);
+    expect(mockCompanyService.findAll).toHaveBeenCalledWith(
+      page,
+      limit,
+      searchTerm,
+    );
+    expect(result).toEqual(mockCompaniesResponse);
   });
 
   it('should return a company by id', async () => {
@@ -80,7 +93,7 @@ describe('CompanyController', () => {
     const dto: UpdateCompanyDto = {
       name: 'Atualizado',
       tradeName: 'Novo Nome',
-      cnpj: '98765432100010',
+      taxId: '98765432100010',
       address: 'Rua Y',
     };
 
