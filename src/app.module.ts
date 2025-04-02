@@ -4,13 +4,15 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CompanyModule } from './modules/company/company.module';
 import { EmailService } from './shared/email/email.service';
-import { EmailModule } from './shared/email/email.module';
 
+import { CompanyModule } from './modules/company/company.module';
+import { EmailModule } from './shared/email/email.module';
 import { SeedModule } from './modules/seed/seed.module';
+import { HealthModule } from './modules/health/health.module';
+import { StatusController } from './modules/status/status.controller';
+import { StatusModule } from './modules/status/status.module';
+
 @Module({
   imports: [
     SentryModule.forRoot(),
@@ -31,10 +33,11 @@ import { SeedModule } from './modules/seed/seed.module';
     CompanyModule,
     EmailModule,
     SeedModule,
+    HealthModule,
+    StatusModule,
   ],
-  controllers: [AppController],
+  controllers: [StatusController],
   providers: [
-    AppService,
     EmailService,
     {
       provide: APP_FILTER,
