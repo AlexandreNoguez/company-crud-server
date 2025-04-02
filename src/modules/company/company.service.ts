@@ -30,15 +30,15 @@ export class CompanyService {
   async create(createCompanyDto: CreateCompanyDto): Promise<Company | null> {
     try {
       const company = this.companyRepository.create(createCompanyDto);
-      const saved = await this.companyRepository.save(company);
+      const saved: Company = await this.companyRepository.save(company);
 
       await this.emailService.sendCompanyNotification(
         {
-          nome: saved.name,
-          nomeFantasia: saved.tradeName,
-          cnpj: saved.cnpj,
-          endereco: saved.address,
-          destinatario: process.env.NOTIFY_EMAILS!,
+          name: saved.name,
+          tradeName: saved.tradeName,
+          taxId: saved.taxId,
+          address: saved.address,
+          recipients: process.env.NOTIFY_EMAILS!,
         },
         COMPANY_CREATED_TEMPLATE,
         NEW_COMPANY_CREATED_TITLE,
@@ -55,19 +55,35 @@ export class CompanyService {
    * Lista todas as empresas cadastradas.
    * @returns Lista de empresas
    */
-  async findAll(page = 1, limit = 10) {
-    const [data, total] = await this.companyRepository.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
-      order: { id: 'ASC' },
-    });
+  async findAll(
+    page = 1,
+    limit = 10,
+    searchTerm?: string,
+  ): Promise<{
+    data: Company[];
+    total: number;
+    page: number;
+    lastPage: number;
+  }> {
+    const sanitizedSearchTerm = searchTerm?.toLowerCase() || '';
 
-    return {
-      data,
-      total,
-      page,
-      lastPage: Math.ceil(total / limit),
-    };
+    const offset = (page - 1) * limit;
+
+    const [data, total] = await this.companyRepository
+      .createQueryBuilder('company')
+      .where('LOWER(company.name) LIKE LOWER(:searchTerm)', {
+        searchTerm: `%${sanitizedSearchTerm}%`,
+      })
+      .orWhere('LOWER(company.tradeName) LIKE LOWER(:searchTerm)', {
+        searchTerm: `%${sanitizedSearchTerm}%`,
+      })
+      .skip(offset)
+      .take(limit)
+      .getManyAndCount();
+
+    const lastPage = Math.ceil(total / limit);
+
+    return { data, total, page, lastPage };
   }
 
   /**
@@ -113,11 +129,11 @@ export class CompanyService {
 
       await this.emailService.sendCompanyNotification(
         {
-          nome: updated.name,
-          nomeFantasia: updated.tradeName,
-          cnpj: updated.cnpj,
-          endereco: updated.address,
-          destinatario: process.env.NOTIFY_EMAILS!,
+          name: updated.name,
+          tradeName: updated.tradeName,
+          taxId: updated.taxId,
+          address: updated.address,
+          recipients: process.env.NOTIFY_EMAILS!,
         },
         COMPANY_UPDATED_TEMPLATE,
         COMPANY_UPDATED_TITLE,

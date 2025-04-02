@@ -46,17 +46,17 @@ export class EmailService {
     const template = this.loadTemplate(templateName);
 
     const html = template({
-      nome: company.nome,
-      cnpj: company.cnpj,
-      nomeFantasia: company.nomeFantasia,
-      endereco: company.endereco,
+      name: company.name,
+      taxId: company.taxId,
+      tradeName: company.tradeName,
+      address: company.address,
     });
 
     await this.transporter.sendMail({
       from: process.env.MAIL_FROM,
-      to: company.destinatario,
+      to: company.recipients,
       subject,
-      text: `Nova empresa cadastrada: ${company.nome} - ${company.cnpj}`,
+      text: `Nova empresa cadastrada: ${company.name} - ${company.taxId}`,
       html,
       headers: {
         'List-Unsubscribe': '<mailto:suporte@alexandrenoguez.dev.br>',
