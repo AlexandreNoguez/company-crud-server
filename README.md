@@ -55,7 +55,6 @@ src/
 
 - Testes unitários em serviços, helpers e filtros
 - Testes e2e para rota raiz e criação de empresas
-- Cobertura de +84%
 
 ### 🛠 Utilitários Relevantes
 
