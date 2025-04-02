@@ -38,13 +38,10 @@ describe('AppController (e2e)', () => {
       taxId: `11.316.678/${randomNumber}-98`,
       address: 'Rua Teste, 123 - Centro, Cidade Teste - SP',
     };
-    console.log(companyPayload);
 
-    const response = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .post('/companies')
       .send(companyPayload)
       .expect(201);
-
-    console.log(response.body);
   });
 });
