@@ -16,7 +16,7 @@ export class Company {
   name: string;
 
   @Column({ unique: true })
-  cnpj: string;
+  taxId: string;
 
   @Column()
   tradeName: string;

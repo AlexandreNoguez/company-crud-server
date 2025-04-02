@@ -1,7 +1,7 @@
 export type Company = {
-  nome: string;
-  cnpj: string;
-  nomeFantasia: string;
-  endereco: string;
-  destinatario: string;
+  name: string;
+  taxId: string;
+  tradeName: string;
+  address: string;
+  recipients?: string;
 };

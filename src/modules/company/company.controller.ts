@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -43,6 +45,7 @@ export class CompanyController {
   @ApiOperation({ summary: 'Lista todas as empresas paginadas' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'searchTerm', required: false, type: String })
   @ApiResponse({
     status: 200,
     description: 'Empresas com paginação',
@@ -56,10 +59,11 @@ export class CompanyController {
     },
   })
   async findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('searchTerm') searchTerm?: string,
   ) {
-    return await this.companyService.findAll(Number(page), Number(limit));
+    return await this.companyService.findAll(page, limit, searchTerm);
   }
 
   @Get(':id')

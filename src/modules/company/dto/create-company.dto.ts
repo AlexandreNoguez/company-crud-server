@@ -11,7 +11,7 @@ export class CreateCompanyDto {
   @ApiProperty({ example: '98.722.004/0001-04' })
   @IsNotEmpty()
   @IsString()
-  cnpj: string;
+  taxId: string;
 
   @ApiProperty({ example: 'NoguezFantasy' })
   @IsNotEmpty()
