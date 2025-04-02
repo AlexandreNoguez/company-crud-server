@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import * as handlebars from 'handlebars';
-import * as fs from 'fs';
-import * as path from 'path';
 import { Company } from '../../@types/company';
 import { EmailTemplatesNames } from '../../enums/email-templates.enum';
+import { loadTemplate } from '../helpers/template-loader/template-loader';
+import { LIST_UNSUBSCRIBE } from '../../constants/email-templates';
 @Injectable()
 export class EmailService {
   private readonly transporter: nodemailer.Transporter;
@@ -23,27 +22,12 @@ export class EmailService {
     } as nodemailer.TransportOptions);
   }
 
-  private loadTemplate(templateName: string): handlebars.TemplateDelegate {
-    try {
-      const templatesFolderPath = path.resolve(__dirname, 'templates');
-      const templatePath = path.join(templatesFolderPath, templateName);
-      const templateSource = fs.readFileSync(templatePath, 'utf8');
-      return handlebars.compile(templateSource);
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(
-        `Failed to load template ${templateName}: ${errorMessage}`,
-      );
-    }
-  }
-
   async sendCompanyNotification(
     company: Company,
     templateName: EmailTemplatesNames,
     subject: string,
   ): Promise<void> {
-    const template = this.loadTemplate(templateName);
+    const template = loadTemplate(templateName);
 
     const html = template({
       name: company.name,
@@ -59,7 +43,7 @@ export class EmailService {
       text: `Nova empresa cadastrada: ${company.name} - ${company.taxId}`,
       html,
       headers: {
-        'List-Unsubscribe': '<mailto:suporte@alexandrenoguez.dev.br>',
+        'List-Unsubscribe': LIST_UNSUBSCRIBE,
       },
     });
   }

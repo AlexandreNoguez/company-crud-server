@@ -8,3 +8,4 @@ export const COMPANY_UPDATED_TEMPLATE: EmailTemplatesNames =
 
 export const NEW_COMPANY_CREATED_TITLE = 'Nova empresa cadastrada!';
 export const COMPANY_UPDATED_TITLE = 'Empresa atualizada com sucesso!';
+export const LIST_UNSUBSCRIBE = `<mailto:${process.env.UNSUBSCRIBE}>`;

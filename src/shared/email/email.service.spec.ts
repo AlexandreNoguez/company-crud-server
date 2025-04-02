@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as handlebars from 'handlebars';
 import {
   COMPANY_CREATED_TEMPLATE,
+  LIST_UNSUBSCRIBE,
   NEW_COMPANY_CREATED_TITLE,
 } from '../../constants/email-templates';
 
@@ -58,7 +59,7 @@ describe('EmailService', () => {
       subject: NEW_COMPANY_CREATED_TITLE,
       html: '<html>Email content</html>',
       headers: {
-        'List-Unsubscribe': '<mailto:suporte@alexandrenoguez.dev.br>',
+        'List-Unsubscribe': LIST_UNSUBSCRIBE,
       },
       text: `Nova empresa cadastrada: ${company.name} - ${company.taxId}`,
     });
