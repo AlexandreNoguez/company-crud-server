@@ -34,11 +34,11 @@ describe('EmailService', () => {
 
   it('should load and compile the correct template and send an email', async () => {
     const company = {
-      nome: 'Empresa X',
-      nomeFantasia: 'Fantasia LTDA',
-      cnpj: '12345678000199',
-      endereco: 'Rua A',
-      destinatario: 'destinatario@empresa.com',
+      name: 'Empresa X',
+      tradeName: 'Fantasia LTDA',
+      taxId: '12345678000199',
+      address: 'Rua A',
+      recipients: 'recipients@empresa.com',
     };
 
     await emailService.sendCompanyNotification(
@@ -54,13 +54,13 @@ describe('EmailService', () => {
 
     expect(handlebars.compile).toHaveBeenCalledWith('template-source');
     expect(mockSendMail).toHaveBeenCalledWith({
-      to: company.destinatario,
+      to: company.recipients,
       subject: NEW_COMPANY_CREATED_TITLE,
       html: '<html>Email content</html>',
       headers: {
         'List-Unsubscribe': '<mailto:suporte@alexandrenoguez.dev.br>',
       },
-      text: `Nova empresa cadastrada: ${company.nome} - ${company.cnpj}`,
+      text: `Nova empresa cadastrada: ${company.name} - ${company.taxId}`,
     });
   });
 
@@ -70,11 +70,11 @@ describe('EmailService', () => {
     });
 
     const company = {
-      nome: 'Empresa Y',
-      nomeFantasia: 'Fantasia Y',
-      cnpj: '00000000000000',
-      endereco: 'Rua Z',
-      destinatario: 'falha@teste.com',
+      name: 'Empresa Y',
+      tradeName: 'Fantasia Y',
+      taxId: '00000000000000',
+      address: 'Rua Z',
+      recipients: 'falha@teste.com',
     };
 
     await expect(

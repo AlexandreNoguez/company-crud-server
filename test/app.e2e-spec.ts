@@ -35,7 +35,7 @@ describe('AppController (e2e)', () => {
     const companyPayload = {
       name: `e2e Company ${randomNumber}`,
       tradeName: 'e2e Trade',
-      cnpj: `11.316.678/${randomNumber}-98`,
+      taxId: `11.316.678/${randomNumber}-98`,
       address: 'Rua Teste, 123 - Centro, Cidade Teste - SP',
     };
     console.log(companyPayload);
