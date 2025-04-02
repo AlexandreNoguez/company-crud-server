@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from '../src/app.module';
 
 describe('AppController (e2e)', () => {
@@ -15,16 +15,22 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await app.close();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer()).get('/').expect(200).expect({
-      status: 'UP',
-      version: '1.0.0',
-      description: 'This is a simple health check response',
-    });
+  it('/ (GET) should return HTML with health info', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/')
+      .expect(200)
+      .expect('Content-Type', /html/);
+
+    const cleanHtml = response.text.replace(/\s+/g, ' ').trim();
+
+    expect(response.text).toContain('<h1>Health Check</h1>');
+    expect(response.text).toMatch(/API:.*UP/);
+    expect(cleanHtml).toMatch(/DB:\s*(UP|DOWN)/);
+    expect(cleanHtml).toMatch(/Versão:\s*<strong>\d+\.\d+\.\d+<\/strong>/);
   });
 
   it('/companies (POST) - should create a company', async () => {
