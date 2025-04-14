@@ -8,6 +8,10 @@
       {
         "include": "shared/templates/**/*.hbs",
         "outDir": "dist/src"
+      },
+      {
+        "include": "/public/*.png",
+        "outDir": "dist/public"
       }
     ],
     "watchAssets": true
