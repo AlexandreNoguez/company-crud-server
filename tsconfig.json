@@ -25,5 +25,5 @@
     // This improves issue grouping in Sentry.
     "sourceRoot": "/"
   },
-  "include": ["src/**/*", ".github/scripts/*.js"]
+  "include": ["src/**/*", ".github/scripts/*.js", "test/**/*"]
 }

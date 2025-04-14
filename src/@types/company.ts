@@ -3,5 +3,5 @@ export type Company = {
   taxId: string;
   tradeName: string;
   address: string;
-  recipients?: string;
+  recipients: string;
 };

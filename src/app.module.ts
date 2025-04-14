@@ -27,7 +27,7 @@ import { StatusModule } from './modules/status/status.module';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       autoLoadEntities: true,
-      synchronize: true, // use false in production, should be used only in development
+      synchronize: process.env.POSTGRES_SYNC === 'true', // use false in production, should be used only in development
       logging: process.env.POSTGRES_LOGGING === 'true',
     }),
     CompanyModule,
