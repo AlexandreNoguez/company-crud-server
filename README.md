@@ -56,14 +56,6 @@ src/
 - Testes unitários em serviços, helpers e filtros
 - Testes e2e para rota raiz e criação de empresas
 
-### 🛠 Utilitários Relevantes
-
-toBrasiliaTime() – função para ajustar timezone.
-
-useFetchCompanies – hook para integração paginada.
-
-useConfirmDialog – controle de modais reutilizável.
-
 ## 🔧 Como Executar o Projeto
 
 ```bash
